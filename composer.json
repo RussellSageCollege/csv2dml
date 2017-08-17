@@ -1,0 +1,33 @@
+{
+    "name": "the-sage-colleges/csv2dml",
+    "description": "Program that reads a CSV and generates DML output",
+    "keywords": [
+        "dsx",
+        "win",
+        "windsx",
+        "dml",
+        "csv"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Markessinis",
+            "email": "markea@sage.edu"
+        }
+    ],
+    "type": "project",
+    "require": {
+        "php": ">=5.4.0",
+        "the-sage-colleges/dml-php": "~1.0.0",
+        "parsecsv/php-parsecsv": "0.4.5",
+        "symfony/console": "^3.3"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "csv2dml\\": "src/",
+            "csv2dml\\Command\\": "src/Command/"
+        }
+    }
+}

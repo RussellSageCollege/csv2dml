@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+
+<?php
+/**
+ * Created by PhpStorm.
+ * User: melon
+ * Date: 8/16/17
+ * Time: 10:15 PM
+ */
+
+require __DIR__.'/../vendor/autoload.php';
+
+use csv2dml\Command;
+use Symfony\Component\Console\Application;
+
+$application = new Application('csv2dml', '@package_version@');
+$application->add(new Command\Convert());
+$application->run();
