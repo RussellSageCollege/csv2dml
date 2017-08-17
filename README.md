@@ -1,20 +1,34 @@
 # CSV 2 DML
 
-Usage:
+## Setup
 
-Convert `students.csv` to `students.csv.dml`
+* Install PHP on your system.
+* Download the binary(csv2dml.phar) from the [releases page](https://github.com/TheSageColleges/csv2dml/releases).
+
+## Usage:
+
+convert `students.csv` to `students.csv.dml`:
 
 ```bash
 ./csv2dml.phar convert students.csv
 ```
 
-output to a filename
+output to a specific filename:
 
 ```bash
 ./csv2dml.phar convert students.csv output.dml
 ```
 
-CSV Example:
+pad id numbers to specified length:
+
+```bash
+./csv2dml.phar convert students.csv -p 7
+# turns 999999 to 0999999 in output DML
+```
+
+## Format
+
+CSV Input:
 
 ```csv
 first_name,last_name,identifier,email,action,company
