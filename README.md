@@ -19,20 +19,36 @@ output to a specific filename:
 ./csv2dml.phar convert students.csv output.dml
 ```
 
-pad id numbers to specified length:
+pad id numbers to specified length [`-p` or `--pad-to-length`]:
 
 ```bash
-./csv2dml.phar convert students.csv -p 7
+./csv2dml.phar convert students.csv output.dml -p 7
 # turns 999999 to 0999999 in output DML
+```
+
+exclude users from dml file [`-e` or `--excluded-identifiers`]:
+
+```bash
+./csv2dml.phar convert students.csv output.dml -p 7 -e excluded.csv
 ```
 
 ## Format
 
-CSV Input:
+Users CSV Input:
 
 ```csv
-first_name,last_name,identifier,email,action,company
-Luke,Skywalker,9999999,skywal@gmailcom,update,JediAcademy
+first_name,last_name,identifier,email,company
+Luke,Skywalker,9999999,skywal@gmailcom,JediAcademy
+```
+
+Excluded Identifiers CSV:
+
+```csv
+identifier
+9999998
+9999997
+9999996
+9999995
 ```
 
 DML Output:

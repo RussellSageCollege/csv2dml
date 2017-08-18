@@ -36,7 +36,14 @@ class Convert extends Command
                         null
                     ),
                     new InputOption(
-                        'identifier-pad-length',
+                        'excluded-identifiers',
+                        'e',
+                        InputOption::VALUE_OPTIONAL,
+                        'Exclude users with identifiers that match',
+                        null
+                    ),
+                    new InputOption(
+                        'pad-to-length',
                         'p',
                         InputOption::VALUE_OPTIONAL,
                         'The amount of digits the identifier should be padded with',
@@ -51,20 +58,29 @@ class Convert extends Command
         // Store the file paths in vars
         $csv_path = $input->getArgument('in-file');
         $out_path = $input->getArgument('out-file');
-        $pad = $input->getOption('identifier-pad-length');
+        $csv_path_ex = $pad = $input->getOption('excluded-identifiers');
+        $pad = $input->getOption('pad-to-length');
         if (empty($out_path)) $out_path = $csv_path . '.dml';
         // Create CSV parser
         $csv = new parseCSV();
+        $csv_e = new parseCSV();
         // Create the DML formatter
         $dml = new DML();
         // Array to store dml output
         $dml_cmds = array();
+        $excluded = array();
         $c = 0;
 
         // Read the CSV
         $output->write('Reading CSV(' . $csv_path . ') ... ');
         $csv->auto($csv_path);
+        if (!empty($csv_path_ex)) $csv_e->auto($csv_path_ex);
         $output->writeln(' Done!');
+
+        // Flatten the excluded array and pad the identifiers
+        foreach ($csv_e->data as $record) {
+            $excluded[] = $this->pad($pad, $record['identifier']);
+        }
 
         $output->write('Generating DML .');
         foreach ($csv->data as $record) {
@@ -74,27 +90,30 @@ class Convert extends Command
             }
             $c++;
             $identifier = $this->pad($pad, $record['identifier']);
-            $company = $record['company'];
-            $email = $record['email'];
-            $first_name = $record['first_name'];
-            $last_name = $record['last_name'];
+            // If the identifier is not in the excluded array don't add it
+            if (!in_array($identifier, $excluded,true)) {
+                $company = $record['company'];
+                $email = $record['email'];
+                $first_name = $record['first_name'];
+                $last_name = $record['last_name'];
 
-            $dml_cmds[] = $dml->set_id($identifier);
-            $dml_cmds[] = $dml->set_table('Names');
-            $dml_cmds[] = $dml->set_field('FName', $first_name);
-            $dml_cmds[] = $dml->set_field('LName', $last_name);
-            $dml_cmds[] = $dml->set_field('Company ', $company);
-            $dml_cmds[] = $dml->cmd_write();
+                $dml_cmds[] = $dml->set_id($identifier);
+                $dml_cmds[] = $dml->set_table('Names');
+                $dml_cmds[] = $dml->set_field('FName', $first_name);
+                $dml_cmds[] = $dml->set_field('LName', $last_name);
+                $dml_cmds[] = $dml->set_field('Company ', $company);
+                $dml_cmds[] = $dml->cmd_write();
 
-            $dml_cmds[] = $dml->set_table('UDF');
-            $dml_cmds[] = $dml->set_field('UdfNum ', '1');
-            $dml_cmds[] = $dml->set_field('UdfText', $identifier);
-            $dml_cmds[] = $dml->cmd_write();
+                $dml_cmds[] = $dml->set_table('UDF');
+                $dml_cmds[] = $dml->set_field('UdfNum ', '1');
+                $dml_cmds[] = $dml->set_field('UdfText', $identifier);
+                $dml_cmds[] = $dml->cmd_write();
 
-            $dml_cmds[] = $dml->set_table('UDF');
-            $dml_cmds[] = $dml->set_field('UdfNum ', '2');
-            $dml_cmds[] = $dml->set_field('UdfText', $email);
-            $dml_cmds[] = $dml->cmd_write();
+                $dml_cmds[] = $dml->set_table('UDF');
+                $dml_cmds[] = $dml->set_field('UdfNum ', '2');
+                $dml_cmds[] = $dml->set_field('UdfText', $email);
+                $dml_cmds[] = $dml->cmd_write();
+            }
         }
         $cmd_string = implode("\n", $dml_cmds);
         $output->writeln(' Done!');
